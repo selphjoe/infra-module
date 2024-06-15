@@ -1,0 +1,1 @@
+kubectl apply -f /mnt/e/personal-devops-projects/infra-tools-module/prometheus/crds/. --server-side
