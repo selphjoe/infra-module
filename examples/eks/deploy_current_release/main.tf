@@ -12,20 +12,20 @@ module "eks" {
 
 }
 
-module "namespace" {
-  source = "../../../namespace"
-  namespace_names = [ 
-    test,
-    test-demo
-  ]
-  depends_on = [ module.eks ]
+# module "namespace" {
+#   source = "../../../namespace"
+#   namespace_names = [ 
+#     test,
+#     test-demo
+#   ]
+#   depends_on = [ module.eks ]
 
-}
+# }
 
-module "nginx" {
-  source = "../../../nginx"
-  depends_on = [ module.namespace ]
+# module "nginx" {
+#   source = "../../../nginx"
+#   depends_on = [ module.namespace ]
 
-}
+# }
 
 # how can i deploy the namespace and nginx helm release module into eks module "above after the ekse have been created in a single terraform apply
