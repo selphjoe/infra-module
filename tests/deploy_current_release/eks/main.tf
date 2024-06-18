@@ -1,5 +1,5 @@
 module "eks" {
-  source = "git@github.com:selphjoe/infra-module.git//cloud-servers/aws/eks?ref=v0.0.0"
+  source = "git@github.com:selphjoe/infra-module.git//cloud-servers/aws/eks?ref=v0.2.0"
   cluster_name = "test-eks"
   coredns_version = "v1.9.3-eksbuild.15"
   kube_proxy_version = "v1.25.16-eksbuild.8"
