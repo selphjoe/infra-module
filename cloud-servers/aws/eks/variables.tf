@@ -1,7 +1,4 @@
-variable "cluster_version" {
-  type        = string
-  description = "K8s version"
-}
+
 
 variable "cluster_name" {
   type        = string
