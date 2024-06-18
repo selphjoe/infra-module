@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	currentRelease    = "../examples/eks/deploy_current_release/"
-	upgradableRelease = "../examples/eks/upgradable_release/"
-	EC2Dir            = "../cloud-servers/aws/ecs"
+	terraformDir = "../examples/eks/"
+	terraformDirOld    = "./deploy_current_release/eks"
+	ec2Dir            = "../cloud-servers/aws/ecs"
 )
 func TestEKSDeploy(t *testing.T) {
 
 	// Define the Terraform options
 	options := &terraform.Options{
-		TerraformDir: currentRelease,
+		TerraformDir: terraformDir,
 		NoColor:      true,
 	}
 
@@ -27,7 +27,7 @@ func TestEKSDeploy(t *testing.T) {
 	VerifyEKSCluster(t)
 
 	// Sleep for a period before destroying the Terraform infrastructure
-	time.Sleep(10 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	// perform a cleanup
 	defer func() {
@@ -38,13 +38,13 @@ func TestEKSDeploy(t *testing.T) {
 func TestEKSUpgrade(t *testing.T) {
 
 	// Define the Terraform options for the current release
-	currentReleaseOptions := &terraform.Options{
-		TerraformDir: currentRelease,
+	terraformDirOldOptions := &terraform.Options{
+		TerraformDir: terraformDirOld,
 		NoColor:      true,
 	}
 
 	// Initialize and apply the Terraform configuration for the current release
-	InitAndApply(t, currentReleaseOptions)
+	InitAndApply(t, terraformDirOldOptions)
 
 	// Verify cluster creation by updating the kubeconfig, get nodes and pods
 	VerifyEKSCluster(t)
@@ -53,17 +53,17 @@ func TestEKSUpgrade(t *testing.T) {
 	VerifyEKSVersion(t)
 
 	// Sleep for a period before performing upgrade
-	time.Sleep(10 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	// If the current release was successful, proceed to upgrade the cluster using the upgradable release
 	if t.Failed() == false {
 		// Define the Terraform options for the upgradable release
-		upgradableReleaseOptions := &terraform.Options{
-			TerraformDir: upgradableRelease,
+		terraformDirOptions := &terraform.Options{
+			TerraformDir: terraformDir,
 			NoColor:      true,
 		}
 		// Initialize and apply the Terraform configuration for the upgradable release
-		InitAndApply(t, upgradableReleaseOptions)
+		InitAndApply(t, terraformDirOptions)
 	}
 
 	// Verify cluster creation by updating the kubeconfig, get nodes and pods
@@ -77,11 +77,11 @@ func TestEKSUpgrade(t *testing.T) {
 
 	// perform a cleanup
 	defer func() {
-		upgradableReleaseOptions := &terraform.Options{
-			TerraformDir: upgradableRelease,
+		terraformDirOptions := &terraform.Options{
+			TerraformDir: terraformDir,
 			NoColor:      true,
 		}
-		Destroy(t, upgradableReleaseOptions)
+		Destroy(t, terraformDirOptions)
 	}()
 }
 
