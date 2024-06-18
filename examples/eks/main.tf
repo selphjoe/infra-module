@@ -1,5 +1,5 @@
 module "eks" {
-  source = "../../../cloud-servers/aws/eks"
+  source = "../../cloud-servers/aws/eks"
   cluster_version = "1.26"
   cluster_name = "test-eks"
   coredns_version = "v1.9.3-eksbuild.15"
