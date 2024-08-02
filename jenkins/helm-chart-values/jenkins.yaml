@@ -393,10 +393,10 @@ controller:
   # Plugins will be installed during Jenkins controller start
   # -- List of Jenkins plugins to install. If you don't want to install plugins, set it to `false`
   installPlugins:
-    - kubernetes:4219.v40ff98cfb_d6f
-    - workflow-aggregator:596.v8c21c963d92d
+    - kubernetes:4265.v78b_d4a_1c864a_
+    - workflow-aggregator:600.vb_57cdd26fdd7
     - git:5.2.2
-    - configuration-as-code:1807.v0175eda_00a_20
+    - configuration-as-code:1836.vccda_4a_122a_a_e
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
@@ -533,6 +533,10 @@ controller:
     authorizationStrategy: |-
       loggedInUsersCanDoAnything:
         allowAnonymousRead: false
+
+    # -- Annotations for the JCasC ConfigMap
+    configMapAnnotations: {}
+
   # -- Custom init-container specification in raw-yaml format
   customInitContainers: []
   # - name: custom-init
@@ -554,7 +558,7 @@ controller:
         # -- Repository of the image that triggers the reload
         repository: kiwigrid/k8s-sidecar
         # -- Tag for the image that triggers the reload
-        tag: 1.27.1
+        tag: 1.27.5
       imagePullPolicy: IfNotPresent
       resources: {}
         #   limits:
@@ -563,6 +567,24 @@ controller:
         #   requests:
         #     cpu: 50m
         #     memory: 50Mi
+      # -- Enables additional volume mounts for the config auto-reload container
+      additionalVolumeMounts: []
+        #   - name: auto-reload-config
+        #     mountPath: /var/config/logger
+        #   - name: auto-reload-logs
+        #     mountPath: /var/log/auto_reload
+      # -- Config auto-reload logging settings
+      logging:
+        # See default settings https://github.com/kiwigrid/k8s-sidecar/blob/master/src/logger.py
+        configuration:
+          # -- Enables custom log config utilizing using the settings below.
+          override: false
+          logLevel: INFO
+          formatter: JSON
+          logToConsole: true
+          logToFile: false
+          maxBytes: 1024
+          backupCount: 3
 
       # -- The scheme to use when connecting to the Jenkins configuration as code endpoint
       scheme: http
@@ -650,6 +672,9 @@ controller:
   # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   # -- Update strategy for StatefulSet
   updateStrategy: {}
+
+  # -- Topology spread constraints
+  topologySpreadConstraints: {}
 
   ingress:
     # -- Enables ingress
@@ -888,6 +913,10 @@ agent:
   # connects to the specified host and port, instead of connecting directly to the Jenkins controller
   # -- Overrides the Kubernetes Jenkins tunnel
   jenkinsTunnel:
+  # -- Disables the verification of the controller certificate on remote connection. This flag correspond to the "Disable https certificate check" flag in kubernetes plugin UI
+  skipTlsVerify: false
+  # -- Enable the possibility to restrict the usage of this agent to specific folder. This flag correspond to the "Restrict pipeline support to authorized folders" flag in kubernetes plugin UI
+  usageRestricted: false
   # -- The connection timeout in seconds for connections to Kubernetes API. The minimum value is 5
   kubernetesConnectTimeout: 5
   # -- The read timeout in seconds for connections to Kubernetes API. The minimum value is 15
@@ -908,7 +937,7 @@ agent:
     # -- Repository to pull the agent jnlp image from
     repository: "jenkins/inbound-agent"
     # -- Tag of the image to pull
-    tag: "3248.v65ecb_254c298-1"
+    tag: "3256.v88a_f6e922152-1"
   # -- Configure working directory for default agent
   workingDir: "/home/jenkins/agent"
   nodeUsageMode: "NORMAL"
@@ -1081,6 +1110,8 @@ agent:
 
   # -- Defines how the raw yaml field gets merged with yaml definitions from inherited pod templates. Possible values: "merge" or "override"
   yamlMergeStrategy: "override"
+  # -- Controls whether the defined yaml merge strategy will be inherited if another defined pod template is configured to inherit from the current one
+  inheritYamlMergeStrategy: false
   # -- Timeout in seconds for an agent to be online
   connectTimeout: 100
   # -- Annotations to apply to the pod
